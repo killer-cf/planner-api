@@ -18,7 +18,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_10_195507) do
     t.string "destination"
     t.date "starts_at"
     t.date "ends_at"
-    t.boolean "is_confirmed"
+    t.boolean "is_confirmed", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

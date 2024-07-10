@@ -3,9 +3,14 @@ class Api::V1::TripsController < ApplicationController
 
   # GET /trips
   def index
-    @trips = Trip.all
+    if params[:page].present?
+      @trips = Trip.page(params[:page]).per(params[:per_page] || 20)
 
-    render json: @trips
+      render json: @trips, meta: pagination_dict(@trips)
+    else
+      @trips = Trip.all
+      render json: @trips
+    end
   end
 
   # GET /trips/1
@@ -18,7 +23,7 @@ class Api::V1::TripsController < ApplicationController
     @trip = Trip.new(trip_params)
 
     if @trip.save
-      render json: @trip, status: :created, location: @trip
+      render json: @trip, status: :created
     else
       render json: @trip.errors, status: :unprocessable_entity
     end
@@ -43,10 +48,12 @@ class Api::V1::TripsController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_trip
     @trip = Trip.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: "Trip with id: #{params[:id]} not found" }, status: :not_found
   end
 
   # Only allow a list of trusted parameters through.
   def trip_params
-    params.require(:trip).permit(:destination, :starts_at, :ends_at, :is_confirmed)
+    params.require(:trip).permit(:destination, :starts_at, :ends_at)
   end
 end

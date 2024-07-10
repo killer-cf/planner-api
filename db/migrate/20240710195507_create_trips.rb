@@ -4,7 +4,7 @@ class CreateTrips < ActiveRecord::Migration[7.1]
       t.string :destination
       t.date :starts_at
       t.date :ends_at
-      t.boolean :is_confirmed
+      t.boolean :is_confirmed, default: false
 
       t.timestamps
     end
