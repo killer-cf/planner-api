@@ -23,6 +23,7 @@ class Api::V1::TripsController < ApplicationController
     @trip = Trip.new(trip_params)
 
     if @trip.save
+      TripMailer.with(owner_name: params[:owner_name], owner_email: params[:owner_email]).confirm_trip.deliver_later
       render json: @trip, status: :created
     else
       render json: @trip.errors, status: :unprocessable_entity
