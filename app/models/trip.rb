@@ -1,5 +1,6 @@
 class Trip < ApplicationRecord
   has_many :participants, dependent: :destroy
+  has_many :activities, dependent: :destroy
 
   validates :destination, :starts_at, :ends_at, presence: true
   validates :destination, length: { minimum: 4 }
