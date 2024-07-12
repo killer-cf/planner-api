@@ -1,7 +1,6 @@
 class Api::V1::TripsController < ApplicationController
-  before_action :set_trip, only: %i[show update destroy confirm]
+  before_action :set_trip, only: %i[show update destroy confirm activities links]
 
-  # GET /trips
   def index
     if params[:page].present?
       @trips = Trip.page(params[:page]).per(params[:per_page] || 20)
@@ -13,12 +12,10 @@ class Api::V1::TripsController < ApplicationController
     end
   end
 
-  # GET /trips/1
   def show
     render json: @trip
   end
 
-  # POST /trips
   def create
     @trip = Trip.new(trip_params)
     set_participants_on_trip
@@ -32,7 +29,6 @@ class Api::V1::TripsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /trips/1
   def update
     if @trip.update(trip_params)
       render json: @trip
@@ -41,7 +37,6 @@ class Api::V1::TripsController < ApplicationController
     end
   end
 
-  # DELETE /trips/1
   def destroy
     @trip.destroy!
   end
@@ -59,9 +54,16 @@ class Api::V1::TripsController < ApplicationController
     redirect_to "http://localhost:3000/trips/#{@trip.id}"
   end
 
+  def activities
+    render json: @trip.activities
+  end
+
+  def links
+    render json: @trip.links
+  end
+
   private
 
-  # Use callbacks to share common setup or constraints between actions.
   def set_trip
     @trip = Trip.find(params[:id])
   rescue ActiveRecord::RecordNotFound
@@ -77,7 +79,6 @@ class Api::V1::TripsController < ApplicationController
     @trip.participants.build(participants)
   end
 
-  # Only allow a list of trusted parameters through.
   def trip_params
     params.permit(:destination, :starts_at, :ends_at)
   end

@@ -1,12 +1,6 @@
 class Api::V1::LinksController < ApplicationController
   before_action :set_link, only: %i[destroy]
 
-  def index
-    @links = Link.all
-
-    render json: @links
-  end
-
   def create
     @link = Link.new(link_params)
 

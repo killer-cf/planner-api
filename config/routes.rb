@@ -5,12 +5,16 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :activities, except: %i[show update]
+      resources :activities, only: %i[create destroy]
 
-      resources :links, except: %i[show update]
+      resources :links, only: %i[create destroy]
 
       resources :trips do
-        get :confirm, on: :member
+        member do
+          get :confirm
+          get :activities
+          get :links
+        end
       end
 
       resources :participants, only: %i[index] do
