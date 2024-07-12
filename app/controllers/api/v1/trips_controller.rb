@@ -55,7 +55,20 @@ class Api::V1::TripsController < ApplicationController
   end
 
   def activities
-    render json: @trip.activities
+    acts = @trip.activities.order(:occurs_at)
+
+    difference_in_days = (@trip.ends_at.to_date - @trip.starts_at.to_date).to_i
+
+    activities_per_date = (difference_in_days + 1).times.map do |i|
+      date = @trip.starts_at + i.days
+      start_of_day = date.beginning_of_day
+      end_of_day = date.end_of_day
+      filtered_activities = acts.select { |act| act[:occurs_at].between?(start_of_day, end_of_day) }
+
+      { date: date, activities: filtered_activities }
+    end
+
+    render json: { activities: activities_per_date }
   end
 
   def links

@@ -24,6 +24,6 @@ class Api::V1::ActivitiesController < ApplicationController
   end
 
   def activity_params
-    params.permit(:title, :occurs_at, :trip_id)
+    params.permit(:title, :occurs_at).merge(trip_id: params[:id])
   end
 end

@@ -24,6 +24,6 @@ class Api::V1::LinksController < ApplicationController
   end
 
   def link_params
-    params.permit(:title, :url, :trip_id)
+    params.permit(:title, :url).merge(trip_id: params[:id])
   end
 end

@@ -2,12 +2,13 @@ class Activity < ApplicationRecord
   belongs_to :trip
 
   validates :title, :occurs_at, presence: true
+  validates :title, length: { minimum: 4 }
   validate :occurs_at_is_valid_date
 
   private
 
   def occurs_at_is_valid_date
-    return if valid_date?(ends_at)
+    return if valid_date?(occurs_at)
 
     errors.add(:occurs_at, 'must be a valid date')
   end

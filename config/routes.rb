@@ -5,15 +5,17 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :activities, only: %i[create destroy]
+      resources :activities, only: [:destroy]
 
-      resources :links, only: %i[create destroy]
+      resources :links, only: [:destroy]
 
       resources :trips do
         member do
           get :confirm
           get :activities
           get :links
+          post :activities, to: 'activities#create'
+          post :links, to: 'links#create'
         end
       end
 
