@@ -1,17 +1,11 @@
-class Api::V1
+class Api::V1::ActivitiesController < ApplicationController
   before_action :set_activity, only: %i[destroy]
-
-  def index
-    @activities = Activity.all
-
-    render json: @activities
-  end
 
   def create
     @activity = Activity.new(activity_params)
 
     if @activity.save
-      render json: @activity, status: :created, location: @activity
+      render json: @activity, status: :created
     else
       render json: { errors: @activity.errors.full_messages }, status: :unprocessable_entity
     end
@@ -25,9 +19,11 @@ class Api::V1
 
   def set_activity
     @activity = Activity.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: "activity with id: #{params[:id]} not found" }, status: :not_found
   end
 
   def activity_params
-    params.require(:activity).permit(:title, :occurs_at, :trip_id)
+    params.permit(:title, :occurs_at, :trip_id)
   end
 end
