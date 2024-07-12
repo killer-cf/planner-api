@@ -1,5 +1,5 @@
 class Api::V1::TripsController < ApplicationController
-  before_action :set_trip, only: %i[show update destroy confirm activities links participants]
+  before_action :set_trip, only: %i[show update destroy confirm activities links participants invites]
 
   def index
     if params[:page].present?
@@ -77,6 +77,18 @@ class Api::V1::TripsController < ApplicationController
 
   def participants
     render json: @trip.participants
+  end
+
+  def invites
+    @trip.participants.build(email: params[:email], name: params[:name])
+
+    if @trip.save
+      participant = @trip.participants.find_by(email: params[:email])
+      TripMailer.with(email: params[:email], trip: @trip, participant_id: participant.id).confirm_trip.deliver_later
+      render json: { trip_id: @trip.id }, status: :created
+    else
+      render json: { errors: @trip.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private

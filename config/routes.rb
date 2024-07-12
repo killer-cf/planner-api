@@ -15,12 +15,13 @@ Rails.application.routes.draw do
           get :participants
           get :activities
           get :links
+          post :invites
           post :activities, to: 'activities#create'
           post :links, to: 'links#create'
         end
       end
 
-      get 'paticipants/:id/confirm', to: 'participants#confirm'
+      get 'participants/:id/confirm', to: 'participants#confirm'
     end
   end
 end
