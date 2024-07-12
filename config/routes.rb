@@ -12,6 +12,7 @@ Rails.application.routes.draw do
       resources :trips do
         member do
           get :confirm
+          get :participants
           get :activities
           get :links
           post :activities, to: 'activities#create'
@@ -19,9 +20,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :participants, only: %i[index] do
-        get :confirm, on: :member
-      end
+      get 'paticipants/:id/confirm', to: 'participants#confirm'
     end
   end
 end

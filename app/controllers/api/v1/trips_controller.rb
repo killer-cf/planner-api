@@ -1,5 +1,5 @@
 class Api::V1::TripsController < ApplicationController
-  before_action :set_trip, only: %i[show update destroy confirm activities links]
+  before_action :set_trip, only: %i[show update destroy confirm activities links participants]
 
   def index
     if params[:page].present?
@@ -73,6 +73,10 @@ class Api::V1::TripsController < ApplicationController
 
   def links
     render json: @trip.links
+  end
+
+  def participants
+    render json: @trip.participants
   end
 
   private
