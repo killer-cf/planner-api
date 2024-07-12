@@ -1,5 +1,5 @@
 class Api::V1::TripsController < ApplicationController
-  before_action :set_trip, only: %i[show update destroy]
+  before_action :set_trip, only: %i[show update destroy confirm]
 
   # GET /trips
   def index
@@ -44,6 +44,19 @@ class Api::V1::TripsController < ApplicationController
   # DELETE /trips/1
   def destroy
     @trip.destroy!
+  end
+
+  def confirm
+    redirect_to "http://localhost:3000/trips/#{@trip.id}" and return if @trip.is_confirmed
+
+    @trip.update!(is_confirmed: true)
+
+    participants = @trip.participants.where(is_owner: false)
+    participants.each do |p|
+      TripMailer.with(email: p.email, trip: @trip, participant_id: p.id).confirm_trip.deliver_later
+    end
+
+    redirect_to "http://localhost:3000/trips/#{@trip.id}"
   end
 
   private
