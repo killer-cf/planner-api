@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_10_195507) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_11_193012) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "participants", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.boolean "is_confirmed", default: false
+    t.boolean "is_owner", default: false
+    t.uuid "trip_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trip_id"], name: "index_participants_on_trip_id"
+  end
 
   create_table "trips", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "destination"
@@ -23,4 +34,5 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_10_195507) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "participants", "trips"
 end
