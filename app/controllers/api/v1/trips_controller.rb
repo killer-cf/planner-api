@@ -21,12 +21,14 @@ class Api::V1::TripsController < ApplicationController
   # POST /trips
   def create
     @trip = Trip.new(trip_params)
+    set_participants_on_trip
 
     if @trip.save
-      TripMailer.with(owner_name: params[:owner_name], owner_email: params[:owner_email]).confirm_trip.deliver_later
-      render json: @trip, status: :created
+      TripMailer.with(owner_name: params[:owner_name], owner_email: params[:owner_email],
+                      trip: @trip).create_trip.deliver_later
+      render json: { trip_id: @trip.id }, status: :created
     else
-      render json: @trip.errors, status: :unprocessable_entity
+      render json: { errors: @trip.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -53,8 +55,17 @@ class Api::V1::TripsController < ApplicationController
     render json: { error: "Trip with id: #{params[:id]} not found" }, status: :not_found
   end
 
+  def set_participants_on_trip
+    participants = [{ name: params[:owner_name], email: params[:owner_email], is_owner: true,
+                      is_confirmed: true }]
+
+    params[:emails_to_invite]&.each { |email| participants << { email: email } }
+
+    @trip.participants.build(participants)
+  end
+
   # Only allow a list of trusted parameters through.
   def trip_params
-    params.require(:trip).permit(:destination, :starts_at, :ends_at)
+    params.permit(:destination, :starts_at, :ends_at)
   end
 end
