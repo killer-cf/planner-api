@@ -21,7 +21,9 @@ Rails.application.routes.draw do
         end
       end
 
-      get 'participants/:id/confirm', to: 'participants#confirm'
+      resources :participants, only: %i[show destroy update] do
+        get :confirm, on: :member
+      end
     end
   end
 end
