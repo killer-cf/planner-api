@@ -76,7 +76,7 @@ class Api::V1::TripsController < ApplicationController
   end
 
   def participants
-    render json: @trip.participants
+    render json: @trip.participants.where(is_owner: false)
   end
 
   def invites

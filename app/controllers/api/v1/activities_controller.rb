@@ -5,7 +5,7 @@ class Api::V1::ActivitiesController < ApplicationController
     @activity = Activity.new(activity_params)
 
     if @activity.save
-      render json: @activity, status: :created
+      render json: { activity_id: @activity.id }, status: :created
     else
       render json: { errors: @activity.errors.full_messages }, status: :unprocessable_entity
     end
