@@ -3,6 +3,7 @@ class Api::V1::UsersController < ApplicationController
 
   def create
     @user = User.new(user_params)
+    @user.participants << Participant.where(email: @user.email)
 
     if @user.save
       render json: { user_id: @user.id }, status: :created
