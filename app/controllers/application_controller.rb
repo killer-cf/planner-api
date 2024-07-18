@@ -1,5 +1,21 @@
 class ApplicationController < ActionController::API
+  include JsonWebToken
+
   private
+
+  def authenticate
+    header = request.headers['Authorization']
+    header = header.split.last if header
+    decoded = jwt_decode(header)
+    if decoded
+      @current_user = User.find_by(external_id: decoded[:sub])
+      render json: { error: 'Não autorizado' }, status: :unauthorized unless @current_user
+    else
+      render json: { error: 'Não autorizado' }, status: :unauthorized
+    end
+  end
+
+  attr_reader :current_user
 
   def pagination_dict(collection)
     {
