@@ -36,6 +36,7 @@ gem 'bootsnap', require: false
 # gem "rack-cors"
 
 gem 'active_model_serializers'
+gem 'dotenv-rails'
 gem 'jwt'
 gem 'kaminari'
 gem 'rswag'

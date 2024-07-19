@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::API
   include JsonWebToken
 
+  before_action :set_web_url
+
   private
 
   def authenticate
@@ -15,7 +17,11 @@ class ApplicationController < ActionController::API
     end
   end
 
-  attr_reader :current_user
+  def set_web_url
+    @web_url = ENV.fetch('WEB_URL')
+  end
+
+  attr_reader :current_user, :web_url
 
   def pagination_dict(collection)
     {

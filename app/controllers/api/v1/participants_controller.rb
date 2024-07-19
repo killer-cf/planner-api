@@ -18,17 +18,12 @@ class Api::V1::ParticipantsController < ApplicationController
   end
 
   def confirm
-    if @participant.is_confirmed
-      redirect_to "http://localhost:3000/sign-in?redirect_url=http://localhost:3000/trips/#{@participant.trip_id}"
-      return
-    end
-
-    @participant.update!(is_confirmed: true)
+    @participant.update!(is_confirmed: true) unless @participant.is_confirmed
 
     if @participant.user.nil?
-      redirect_to "http://localhost:3000/sign-up?redirect_url=http://localhost:3000/api/sign-up-callback?trip_id=#{@participant.trip_id}&email=#{@participant.email}"
+      redirect_to "#{web_url}/sign-up?redirect_url=#{web_url}/api/sign-up-callback?trip_id=#{@participant.trip_id}&email=#{@participant.email}"
     else
-      redirect_to "http://localhost:3000/sign-in?redirect_url=http://localhost:3000/trips/#{@participant.trip_id}"
+      redirect_to "#{web_url}/sign-in?redirect_url=#{web_url}/trips/#{@participant.trip_id}"
     end
   end
 
