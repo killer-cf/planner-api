@@ -3,9 +3,9 @@ class Api::V1::UsersController < ApplicationController
 
   def create
     @user = User.new(user_params)
-    @user.participants << Participant.where(email: @user.email)
 
     if @user.save
+      @user.add_participants_by_emails([params[:participant_email], @user.email])
       render json: { user_id: @user.id }, status: :created
     else
       render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
