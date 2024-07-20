@@ -1,34 +1,50 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :set_user, only: %i[update]
+  before_action :set_user, only: %i[update_webhook destroy_webhook]
+  before_action :validate_params, only: %i[create_webhook update_webhook destroy_webhook]
 
-  def create
-    @user = User.new(user_params)
+  def update_webhook
+    name = "#{params[:data][:first_name]} #{params[:data][:last_name]}".strip
+    email = params[:data][:email_addresses]&.first&.dig(:email_address)
 
-    if @user.save
-      @user.add_participants_by_emails([params[:participant_email], @user.email])
-      render json: { user_id: @user.id }, status: :created
+    @user.add_participants_by_emails([params[:data][:public_metadata][:participant_email]])
+
+    if user.update(name: name, email: email)
+      render status: :no_content
     else
-      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: user.errors.full_messages }, status: :unprocessable
     end
   end
 
-  def update
-    if @user.update(user_params)
+  def create_webhook
+    name = "#{params[:data][:first_name]} #{params[:data][:last_name]}".strip
+    email = params[:data][:email_addresses]&.first&.dig(:email_address)
+    external_id = params[:data][:id]
+
+    @user = User.new(name: name, email: email, external_id: external_id)
+    @user.add_participants_by_emails([params[:data][:public_metadata][:participant_email], @user.email])
+
+    if @user.save
       render status: :no_content
     else
-      render json: @user.errors, status: :unprocessable_entity
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable
     end
+  end
+
+  def destroy_webhook
+    @user.destroy
   end
 
   private
 
   def set_user
-    @user = User.find(params[:id])
+    @user = User.find_by(external_id: params[:data][:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "User with id: #{params[:id]} not found" }, status: :not_found
   end
 
-  def user_params
-    params.permit(:name, :email, :external_id)
+  def validate_params
+    return if params[:data].present?
+
+    render json: { errors: 'Missing data parameter' }, status: :bad_request
   end
 end
