@@ -22,6 +22,7 @@ require 'rspec/rails'
 # require only the support files necessary.
 #
 Rails.root.glob('spec/support/**/*.rb').sort.each { |f| require f }
+ActiveJob::Base.queue_adapter = :test
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
@@ -34,6 +35,15 @@ RSpec.configure do |config|
   config.before(type: :system) do
     driven_by(:rack_test)
   end
+
+  config.before do
+    ENV['WEB_URL'] = 'http://test-url.com'
+  end
+
+  config.after do
+    ENV.delete('WEB_URL')
+  end
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')

@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   has_many :participants, dependent: :nullify
+  has_many :trips, through: :participants
 
   validates :name, :email, :external_id, presence: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }

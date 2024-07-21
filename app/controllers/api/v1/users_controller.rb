@@ -2,6 +2,13 @@ class Api::V1::UsersController < ApplicationController
   before_action :set_user, only: %i[update_webhook destroy_webhook]
   before_action :validate_params, only: %i[create_webhook update_webhook destroy_webhook]
 
+  def show
+    user = User.find_by(external_id: params[:id])
+    render json: user
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: "user with id: #{params[:id]} not found" }, status: :not_found
+  end
+
   def update_webhook
     name = "#{params[:data][:first_name]} #{params[:data][:last_name]}".strip
     email = params[:data][:email_addresses]&.first&.dig(:email_address)

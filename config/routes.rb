@@ -5,7 +5,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :users, only: %i[] do
+      resources :users, only: %i[show] do
         collection do
           post :create_webhook
           post :update_webhook
