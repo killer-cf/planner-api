@@ -18,4 +18,12 @@ class TripPolicy < ApplicationPolicy
   def destroy?
     user.present? && record.owner == user
   end
+
+  def activities?
+    user.present? && record.users.include?(user)
+  end
+
+  def participants?
+    user.present? && record.users.include?(user)
+  end
 end

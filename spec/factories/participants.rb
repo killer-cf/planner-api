@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :participant do
-    name { "MyString" }
-    email { "MyString" }
+    sequence(:name) { |n| "user #{n}" }
+    sequence(:email) { |n| "email.user#{n}@gmail.com" }
     is_confirmed { false }
     is_owner { false }
     trip { nil }
