@@ -2,7 +2,6 @@ require 'rails_helper'
 include ActiveJob::TestHelper
 
 describe Api::V1::TripsController do
-  let(:user) { create(:user) }
   let(:authorization) { { 'Authorization' => "Bearer #{generate_jwt(user)}" } }
 
   before do
@@ -16,6 +15,7 @@ describe Api::V1::TripsController do
   end
 
   describe 'GET #index' do
+    let(:user) { create(:user) }
     let!(:trips) { create_list(:trip, 5) }
 
     it 'returns a success response' do
@@ -45,10 +45,13 @@ describe Api::V1::TripsController do
   end
 
   describe 'GET #show' do
-    context '' do
+    context 'authorized' do
+      let(:user) { create(:user) }
+
       it 'returns a success response' do
         request.headers.merge!(authorization)
         trip = create(:trip)
+        create(:participant, user:, trip:, email: user.email)
 
         get :show, params: { id: trip.to_param }, format: :json
 
@@ -61,9 +64,32 @@ describe Api::V1::TripsController do
         expect(json_response['is_confirmed']).to eq(trip.is_confirmed)
       end
     end
+
+    context 'unauthorized' do
+      let(:user) { create(:user) }
+
+      it 'returns a 401' do
+        trip = create(:trip)
+
+        get :show, params: { id: trip.to_param }, format: :json
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it 'returns a 403' do
+        request.headers.merge!(authorization)
+        trip = create(:trip)
+
+        get :show, params: { id: trip.to_param }, format: :json
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
   end
 
   describe 'POST #create' do
+    let(:user) { create(:user) }
+
     context 'with valid params' do
       let(:trip_params) { attributes_for(:trip).merge(owner_name: 'John Doe', owner_email: 'costa@gmail.com') }
 
@@ -109,7 +135,9 @@ describe Api::V1::TripsController do
   end
 
   describe 'PUT #update' do
-    context 'with valid params' do
+    let(:user) { create(:user) }
+
+    context 'authorized' do
       let(:new_attributes) do
         { destination: 'Recife, Brazil', ends_at: 1.week.from_now, starts_at: 1.day.from_now }
       end
@@ -117,6 +145,7 @@ describe Api::V1::TripsController do
       it 'updates the requested trip' do
         request.headers.merge!(authorization)
         trip = create(:trip)
+        create(:participant, user:, trip:, email: user.email, is_owner: true)
         put :update, params: { id: trip.to_param }.merge(new_attributes), format: :json
         trip.reload
         expect(trip.destination).to eq('Recife, Brazil')
@@ -124,18 +153,59 @@ describe Api::V1::TripsController do
         expect(trip.ends_at.to_date).to eq(1.week.from_now.to_date)
       end
     end
+
+    context 'unauthorized' do
+      let(:new_attributes) do
+        { destination: 'Recife, Brazil', ends_at: 1.week.from_now, starts_at: 1.day.from_now }
+      end
+
+      it 'returns a 401' do
+        trip = create(:trip)
+        put :update, params: { id: trip.to_param }.merge(new_attributes), format: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it 'returns a 403 if is not owner' do
+        request.headers.merge!(authorization)
+        trip = create(:trip)
+        create(:participant, user:, trip:, email: user.email)
+        put :update, params: { id: trip.to_param }.merge(new_attributes), format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
   end
 
   describe 'DELETE #destroy' do
-    context '' do
+    let(:user) { create(:user) }
+
+    context 'authorized' do
       it 'deletes the trip' do
         request.headers.merge!(authorization)
         trip = create(:trip)
+        create(:participant, user:, trip:, email: user.email, is_owner: true)
 
         expect do
           delete :destroy, params: { id: trip.id }, format: :json
         end.to change(Trip, :count).by(-1)
         expect(response).to have_http_status(:no_content)
+      end
+    end
+
+    context 'unauthorized' do
+      it 'returns a 401' do
+        trip = create(:trip)
+
+        delete :destroy, params: { id: trip.id }, format: :json
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it 'returns a 403 if is not owner' do
+        request.headers.merge!(authorization)
+        trip = create(:trip)
+        create(:participant, user:, trip:, email: user.email, is_owner: false)
+
+        delete :destroy, params: { id: trip.id }, format: :json
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end

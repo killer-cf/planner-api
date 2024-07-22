@@ -95,7 +95,7 @@ class Api::V1::TripsController < ApplicationController
   private
 
   def set_trip
-    @trip = Trip.find(params[:id])
+    @trip = authorize Trip.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Trip with id: #{params[:id]} not found" }, status: :not_found
   end

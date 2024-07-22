@@ -2,6 +2,11 @@ class Trip < ApplicationRecord
   has_many :participants, dependent: :destroy
   has_many :activities, dependent: :destroy
   has_many :links, dependent: :destroy
+  has_many :users, through: :participants
+  has_one :owner_participant, lambda {
+                                where(is_owner: true)
+                              }, class_name: 'Participant', dependent: :destroy, inverse_of: :trip
+  has_one :owner, through: :owner_participant, source: :user
 
   validates :destination, :starts_at, :ends_at, presence: true
   validates :destination, length: { minimum: 4 }
