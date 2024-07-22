@@ -26,4 +26,8 @@ class TripPolicy < ApplicationPolicy
   def participants?
     user.present? && record.users.include?(user)
   end
+
+  def links?
+    user.present? && record.users.include?(user)
+  end
 end
