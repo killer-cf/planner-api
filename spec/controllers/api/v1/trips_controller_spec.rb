@@ -2,6 +2,9 @@ require 'rails_helper'
 include ActiveJob::TestHelper
 
 describe Api::V1::TripsController do
+  let(:user) { create(:user) }
+  let(:authorization) { { 'Authorization' => "Bearer #{generate_jwt(user)}" } }
+
   before do
     clear_enqueued_jobs
     clear_performed_jobs
@@ -16,6 +19,7 @@ describe Api::V1::TripsController do
     let!(:trips) { create_list(:trip, 5) }
 
     it 'returns a success response' do
+      request.headers.merge!(authorization)
       get :index, format: :json
 
       expect(response).to be_successful
@@ -25,6 +29,7 @@ describe Api::V1::TripsController do
     end
 
     it 'paginates results and provide metadata' do
+      request.headers.merge!(authorization)
       get :index, params: { page: 2, per_page: 2 }, format: :json
 
       json_response = response.parsed_body['trips']
@@ -42,6 +47,7 @@ describe Api::V1::TripsController do
   describe 'GET #show' do
     context '' do
       it 'returns a success response' do
+        request.headers.merge!(authorization)
         trip = create(:trip)
 
         get :show, params: { id: trip.to_param }, format: :json
@@ -62,6 +68,7 @@ describe Api::V1::TripsController do
       let(:trip_params) { attributes_for(:trip).merge(owner_name: 'John Doe', owner_email: 'costa@gmail.com') }
 
       it 'creates a new trip' do
+        request.headers.merge!(authorization)
         expect do
           post :create, params: trip_params,
                         format: :json
@@ -69,6 +76,7 @@ describe Api::V1::TripsController do
       end
 
       it 'renders a JSON response with the new trip' do
+        request.headers.merge!(authorization)
         post :create, params: trip_params,
                       format: :json
 
@@ -83,6 +91,7 @@ describe Api::V1::TripsController do
       end
 
       it 'sends a create trip email' do
+        request.headers.merge!(authorization)
         expect do
           post :create, params: trip_params
         end.to have_enqueued_mail(TripMailer, :create_trip).with(
@@ -106,6 +115,7 @@ describe Api::V1::TripsController do
       end
 
       it 'updates the requested trip' do
+        request.headers.merge!(authorization)
         trip = create(:trip)
         put :update, params: { id: trip.to_param }.merge(new_attributes), format: :json
         trip.reload
@@ -119,6 +129,7 @@ describe Api::V1::TripsController do
   describe 'DELETE #destroy' do
     context '' do
       it 'deletes the trip' do
+        request.headers.merge!(authorization)
         trip = create(:trip)
 
         expect do

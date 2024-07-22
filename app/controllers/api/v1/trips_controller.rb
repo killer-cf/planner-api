@@ -1,4 +1,5 @@
 class Api::V1::TripsController < ApplicationController
+  before_action :authenticate, except: :confirm
   before_action :set_trip, only: %i[show update destroy confirm activities links participants invites]
 
   def index

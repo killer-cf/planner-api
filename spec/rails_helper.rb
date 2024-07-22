@@ -32,6 +32,8 @@ rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 RSpec.configure do |config|
+  config.include JsonWebTokenHelper
+
   config.before(type: :system) do
     driven_by(:rack_test)
   end
