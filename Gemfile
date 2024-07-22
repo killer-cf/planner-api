@@ -39,6 +39,7 @@ gem 'active_model_serializers'
 gem 'dotenv-rails'
 gem 'jwt'
 gem 'kaminari'
+gem 'pundit'
 gem 'rswag'
 
 group :development, :test do

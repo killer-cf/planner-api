@@ -1,7 +1,10 @@
 class ApplicationController < ActionController::API
   include JsonWebToken
+  include Pundit::Authorization
 
   before_action :set_web_url
+
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   private
 
@@ -22,6 +25,10 @@ class ApplicationController < ActionController::API
   end
 
   attr_reader :current_user, :web_url
+
+  def user_not_authorized
+    render json: { error: 'Forbidden' }, status: :forbidden
+  end
 
   def pagination_dict(collection)
     {
