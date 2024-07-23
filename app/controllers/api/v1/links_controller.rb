@@ -1,8 +1,9 @@
 class Api::V1::LinksController < ApplicationController
+  before_action :authenticate
   before_action :set_link, only: %i[destroy]
 
   def create
-    @link = Link.new(link_params)
+    @link = authorize Link.new(link_params)
 
     if @link.save
       render json: { link_id: @link.id }, status: :created
@@ -18,7 +19,7 @@ class Api::V1::LinksController < ApplicationController
   private
 
   def set_link
-    @link = Link.find(params[:id])
+    @link = authorize Link.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "link with id: #{params[:id]} not found" }, status: :not_found
   end
