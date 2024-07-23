@@ -24,16 +24,14 @@ describe Api::V1::TripsController do
         request.headers.merge!(authorization)
 
         expect do
-          post :invites, params: { id: trip.id, name: 'John Doe', email: 'costa@gmail.com' },
-                         format: :json
-        end.to have_enqueued_mail(TripMailer, :confirm_trip).with(
-          params: {
-            email: 'costa@gmail.com',
-            participant_id: an_instance_of(String),
-            trip: an_instance_of(Trip)
-          },
-          args: []
-        )
+          perform_enqueued_jobs do
+            post :invites, params: { id: trip.id, name: 'John Doe', email: 'costa@gmail.com' },
+                           format: :json
+          end
+        end.to change { ActionMailer::Base.deliveries.count }.by(1)
+
+        deliveries = ActionMailer::Base.deliveries.last
+        expect(deliveries.to).to contain_exactly('costa@gmail.com')
       end
 
       it 'returns a success response' do

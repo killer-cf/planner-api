@@ -43,7 +43,7 @@ class Api::V1::TripsController < ApplicationController
   end
 
   def confirm
-    redirect_to "http://localhost:3000/trips/#{@trip.id}" and return if @trip.is_confirmed
+    redirect_to "http://localhost:3000/trips/#{@trip.id}", allow_other_host: true and return if @trip.is_confirmed
 
     @trip.update!(is_confirmed: true)
 
@@ -52,7 +52,7 @@ class Api::V1::TripsController < ApplicationController
       TripMailer.with(email: p.email, trip: @trip, participant_id: p.id).confirm_trip.deliver_later
     end
 
-    redirect_to "http://localhost:3000/trips/#{@trip.id}"
+    redirect_to "http://localhost:3000/trips/#{@trip.id}", allow_other_host: true
   end
 
   def activities

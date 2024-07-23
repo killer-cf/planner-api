@@ -34,4 +34,8 @@ class TripPolicy < ApplicationPolicy
   def invites?
     user.present? && record.owner == user
   end
+
+  def confirm?
+    true
+  end
 end
