@@ -86,7 +86,7 @@ class Api::V1::TripsController < ApplicationController
     if @trip.save
       participant = @trip.participants.find_by(email: params[:email])
       TripMailer.with(email: params[:email], trip: @trip, participant_id: participant.id).confirm_trip.deliver_later
-      render json: { trip_id: @trip.id }, status: :created
+      render status: :no_content
     else
       render json: { errors: @trip.errors.full_messages }, status: :unprocessable_entity
     end

@@ -30,4 +30,8 @@ class TripPolicy < ApplicationPolicy
   def links?
     user.present? && record.users.include?(user)
   end
+
+  def invites?
+    user.present? && record.owner == user
+  end
 end
