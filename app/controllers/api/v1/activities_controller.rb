@@ -3,7 +3,7 @@ class Api::V1::ActivitiesController < ApplicationController
   before_action :set_activity, only: %i[destroy]
 
   def create
-    @activity = Activity.new(activity_params)
+    @activity = authorize Activity.new(activity_params)
 
     if @activity.save
       render json: { activity_id: @activity.id }, status: :created
