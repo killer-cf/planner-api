@@ -1,27 +1,33 @@
 require 'rails_helper'
 
 RSpec.describe ActivityPolicy, type: :policy do
-  let(:user) { User.new }
+  subject { described_class.new(user, activity) }
 
-  subject { described_class }
+  let(:user) { create(:user) }
+  let(:activity) { build :activity }
 
-  permissions ".scope" do
-    pending "add some examples to (or delete) #{__FILE__}"
+  context 'with owner' do
+    before { create :participant, user: user, trip: activity.trip, is_owner: true }
+
+    it { is_expected.to permit_actions(%i[create destroy]) }
   end
 
-  permissions :show? do
-    pending "add some examples to (or delete) #{__FILE__}"
+  context 'with participant' do
+    before { create :participant, user: user, trip: activity.trip }
+
+    it { is_expected.to permit_actions(%i[create destroy]) }
   end
 
-  permissions :create? do
-    pending "add some examples to (or delete) #{__FILE__}"
+  context 'with other trip participants' do
+    before do
+      trip = create :trip
+      create :participant, trip: trip
+    end
+
+    it { is_expected.to forbid_all_actions }
   end
 
-  permissions :update? do
-    pending "add some examples to (or delete) #{__FILE__}"
-  end
-
-  permissions :destroy? do
-    pending "add some examples to (or delete) #{__FILE__}"
+  context 'with visitor' do
+    it { is_expected.to forbid_all_actions }
   end
 end
