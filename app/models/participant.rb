@@ -11,6 +11,8 @@ class Participant < ApplicationRecord
   private
 
   def set_user
+    return if user.present?
+
     self.user = User.find_by(email: email)
   end
 end

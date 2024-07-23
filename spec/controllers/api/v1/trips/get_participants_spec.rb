@@ -14,8 +14,6 @@ describe Api::V1::TripsController do
 
         get :participants, params: { id: trip.id }, format: :json
 
-        puts response.parsed_body
-
         expect(response).to be_successful
         expect(response.content_type).to eq('application/json; charset=utf-8')
         json_response = response.parsed_body['participants']

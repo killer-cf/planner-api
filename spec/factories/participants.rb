@@ -4,6 +4,6 @@ FactoryBot.define do
     sequence(:email) { |n| "email.participant#{n}@gmail.com" }
     is_confirmed { false }
     is_owner { false }
-    trip { nil }
+    trip
   end
 end

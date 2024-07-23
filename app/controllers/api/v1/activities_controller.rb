@@ -1,4 +1,5 @@
 class Api::V1::ActivitiesController < ApplicationController
+  before_action :authenticate
   before_action :set_activity, only: %i[destroy]
 
   def create
@@ -18,7 +19,7 @@ class Api::V1::ActivitiesController < ApplicationController
   private
 
   def set_activity
-    @activity = Activity.find(params[:id])
+    @activity = authorize Activity.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "activity with id: #{params[:id]} not found" }, status: :not_found
   end
