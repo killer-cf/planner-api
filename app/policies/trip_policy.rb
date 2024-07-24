@@ -8,34 +8,44 @@ class TripPolicy < ApplicationPolicy
   end
 
   def show?
-    user.present? && record.users.include?(user)
+    participant?
   end
 
   def update?
-    user.present? && record.owner == user
+    owner?
   end
 
   def destroy?
-    user.present? && record.owner == user
+    owner?
   end
 
   def activities?
-    user.present? && record.users.include?(user)
+    participant?
   end
 
   def participants?
-    user.present? && record.users.include?(user)
+    participant?
   end
 
   def links?
-    user.present? && record.users.include?(user)
+    participant?
   end
 
   def invites?
-    user.present? && record.owner == user
+    owner?
   end
 
   def confirm?
     true
+  end
+
+  private
+
+  def owner?
+    user.present? && record.owner == user
+  end
+
+  def participant?
+    user.present? && record.users.include?(user)
   end
 end
