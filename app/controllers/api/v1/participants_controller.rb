@@ -1,13 +1,10 @@
 class Api::V1::ParticipantsController < ApplicationController
-  before_action :set_participant, only: %i[show update destroy confirm]
-
-  def show
-    render json: @participant
-  end
+  before_action :authenticate, except: %i[confirm]
+  before_action :set_participant, only: %i[update destroy confirm]
 
   def update
     if @participant.update(participant_params)
-      render json: @participant
+      render status: :no_content
     else
       render json: { errors: @participant.errors.full_messages }, status: :unprocessable_entity
     end
@@ -21,18 +18,22 @@ class Api::V1::ParticipantsController < ApplicationController
     @participant.update!(is_confirmed: true) unless @participant.is_confirmed
 
     if @participant.user.nil?
-      redirect_to sign_up_url_with_params
+      redirect_to sign_up_url_with_params, allow_other_host: true
     else
-      redirect_to sign_in_url_with_params
+      redirect_to sign_in_url_with_params, allow_other_host: true
     end
   end
 
   private
 
   def set_participant
-    @participant = Participant.find(params[:id])
+    @participant = authorize Participant.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "participant with id: #{params[:id]} not found" }, status: :not_found
+  end
+
+  def participant_params
+    params.permit(:name)
   end
 
   def sign_in_url_with_params
