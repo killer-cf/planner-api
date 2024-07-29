@@ -13,7 +13,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :activities, only: [:destroy]
+      resources :activities, only: [:destroy, :update]
 
       resources :links, only: [:destroy]
 

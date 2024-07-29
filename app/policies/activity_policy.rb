@@ -3,6 +3,10 @@ class ActivityPolicy < ApplicationPolicy
     trip_participant?
   end
 
+  def update?
+    trip_participant?
+  end
+
   def destroy?
     trip_participant?
   end
