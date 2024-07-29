@@ -14,6 +14,8 @@ class Trip < ApplicationRecord
   validate :ends_at_is_valid_date
   validate :ends_at_is_after_starts_at
 
+  after_update :delete_activities_outside_range
+
   private
 
   def starts_at_is_valid_date
@@ -36,5 +38,9 @@ class Trip < ApplicationRecord
 
   def valid_date?(date)
     date.is_a?(Date) || date.is_a?(DateTime) || date.is_a?(Time)
+  end
+
+  def delete_activities_outside_range
+    activities.where('occurs_at < ? OR occurs_at > ?', starts_at, ends_at).destroy_all
   end
 end

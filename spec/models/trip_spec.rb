@@ -46,4 +46,19 @@ RSpec.describe Trip, type: :model do
       end
     end
   end
+
+  describe 'callbacks' do
+    let(:trip) { create(:trip, starts_at: Time.zone.today, ends_at: Time.zone.today + 6.days) }
+
+    it 'deletes activities outside the new date range after update' do
+      activity1 = create(:activity, trip:, occurs_at: Time.zone.today)
+      activity2 = create(:activity, trip:, occurs_at: Time.zone.today + 2.days)
+      activity3 = create(:activity, trip:, occurs_at: Time.zone.today + 6.days)
+
+      trip.update(starts_at: Time.zone.today + 1.day, ends_at: Time.zone.today + 4.days)
+      expect(trip.activities).to include(activity2)
+      expect(trip.activities).not_to include(activity1)
+      expect(trip.activities).not_to include(activity3)
+    end
+  end
 end
