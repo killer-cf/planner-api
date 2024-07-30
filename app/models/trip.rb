@@ -41,6 +41,8 @@ class Trip < ApplicationRecord
   end
 
   def delete_activities_outside_range
-    activities.where('occurs_at < ? OR occurs_at > ?', starts_at, ends_at).destroy_all
+    start_of_day = starts_at.beginning_of_day
+    end_of_day = ends_at.end_of_day
+    activities.where('occurs_at < ? OR occurs_at > ?', start_of_day, end_of_day).destroy_all
   end
 end
