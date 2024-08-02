@@ -19,9 +19,12 @@ class Activity < ApplicationRecord
   end
 
   def occurs_at_within_trip_range
-    return unless trip.present? || occurs_at.present?
+    return if trip.blank? || occurs_at.blank?
 
-    return unless occurs_at < trip.starts_at || occurs_at > trip.ends_at
+    trip_start = trip.starts_at.beginning_of_day
+    trip_end = trip.ends_at.end_of_day
+
+    return unless occurs_at < trip_start || occurs_at > trip_end
 
     errors.add(:occurs_at, 'must be within the trip start and end dates')
   end

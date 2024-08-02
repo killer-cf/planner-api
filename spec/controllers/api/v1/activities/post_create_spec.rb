@@ -8,7 +8,7 @@ describe Api::V1::ActivitiesController do
     context 'valid params' do
       it 'returns a success response' do
         request.headers.merge!(authorization)
-        trip = create :trip
+        trip = create :trip, starts_at: 1.day.from_now, ends_at: 7.days.from_now
         create :participant, trip:, user: user
 
         activity_valid_params = attributes_for(:activity).merge(id: trip.id)

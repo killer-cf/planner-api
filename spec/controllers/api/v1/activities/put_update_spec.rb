@@ -12,9 +12,8 @@ describe Api::V1::ActivitiesController do
 
       it 'updates the requested trip' do
         request.headers.merge!(authorization)
-        trip = create(:trip)
-        activity = create(:activity, trip:)
-        create :participant, user:, trip: trip
+        activity = create(:activity)
+        create :participant, user:, trip: activity.trip
 
         put :update, params: { id: activity.to_param }.merge(new_attributes), format: :json
 
@@ -31,8 +30,7 @@ describe Api::V1::ActivitiesController do
       end
 
       it 'returns a 401' do
-        trip = create(:trip)
-        activity = create(:activity, trip:)
+        activity = create(:activity)
 
         put :update, params: { id: activity.to_param }.merge(new_attributes), format: :json
 
@@ -41,8 +39,7 @@ describe Api::V1::ActivitiesController do
 
       it 'returns a 403 if is not owner' do
         request.headers.merge!(authorization)
-        trip = create(:trip)
-        activity = create(:activity, trip:)
+        activity = create(:activity)
 
         put :update, params: { id: activity.to_param }.merge(new_attributes), format: :json
 

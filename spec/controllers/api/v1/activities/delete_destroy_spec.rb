@@ -9,9 +9,8 @@ describe Api::V1::ActivitiesController do
     context 'authorized' do
       it 'deletes the activity' do
         request.headers.merge!(authorization)
-        trip = create :trip
-        activity = create :activity, trip: trip
-        create :participant, trip:, user: user
+        activity = create :activity
+        create :participant, trip: activity.trip, user: user
 
         expect do
           delete :destroy, params: { id: activity.id }, format: :json

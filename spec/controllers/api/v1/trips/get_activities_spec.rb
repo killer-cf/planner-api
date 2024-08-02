@@ -23,8 +23,11 @@ describe Api::V1::TripsController do
 
       it 'not return another trip activities' do
         request.headers.merge!(authorization)
+
+        other_trip = create :trip, starts_at: 1.day.from_now, ends_at: 7.days.from_now
+
         create_list(:activity, 5, trip: trip, occurs_at: 1.day.from_now)
-        create_list(:activity, 2, occurs_at: 1.day.from_now)
+        create_list(:activity, 2, trip: other_trip, occurs_at: 1.day.from_now)
         create(:participant, user:, trip:, email: user.email)
 
         get :activities, params: { id: trip.id }, format: :json

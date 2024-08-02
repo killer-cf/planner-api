@@ -41,7 +41,7 @@ describe Api::V1::TripsController do
 
         post :invites, params: { id: trip.id, name: 'John Doe', email: 'costa@gmail.com' }, format: :json
 
-        expect(response).to have_http_status(:no_content)
+        expect(response).to have_http_status(:success)
       end
     end
 
