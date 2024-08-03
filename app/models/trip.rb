@@ -1,5 +1,6 @@
 class Trip < ApplicationRecord
   has_many :participants, dependent: :destroy
+  has_many :guests, -> { where(is_owner: false) }, class_name: 'Participant', dependent: :destroy, inverse_of: :trip
   has_many :activities, dependent: :destroy
   has_many :links, dependent: :destroy
   has_many :users, through: :participants
@@ -15,6 +16,12 @@ class Trip < ApplicationRecord
   validate :ends_at_is_after_starts_at
 
   after_update :delete_activities_outside_range
+
+  def send_confirmation_emails
+    guests.each do |participant|
+      TripMailer.with(email: participant.email, trip: self, participant_id: participant.id).confirm_trip.deliver_later
+    end
+  end
 
   private
 

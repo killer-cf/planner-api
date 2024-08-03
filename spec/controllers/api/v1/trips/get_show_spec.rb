@@ -20,7 +20,6 @@ describe Api::V1::TripsController do
         expect(json_response['destination']).to eq(trip.destination)
         expect(Date.parse(json_response['starts_at'])).to eq(trip.starts_at)
         expect(Date.parse(json_response['ends_at'])).to eq(trip.ends_at)
-        expect(json_response['is_confirmed']).to eq(trip.is_confirmed)
       end
     end
 

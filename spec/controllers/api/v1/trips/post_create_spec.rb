@@ -40,23 +40,18 @@ describe Api::V1::TripsController do
         expect(json_response['trip_id']).to eq(trip.id)
         expect(trip_params[:starts_at].to_date).to eq(trip.starts_at.to_date)
         expect(trip_params[:ends_at].to_date).to eq(trip.ends_at.to_date)
-        expect(trip.is_confirmed).to be(false)
       end
 
-      it 'sends a create trip email' do
+      it 'sends a mail to participants' do
         request.headers.merge!(authorization)
         expect do
-          post :create, params: trip_params
-        end.to have_enqueued_mail(TripMailer, :create_trip).with(
-          params: {
-            owner_name: 'John Doe',
-            owner_email: 'costa@gmail.com',
-            trip: an_instance_of(Trip)
-          },
-          args: []
-        )
+          perform_enqueued_jobs do
+            post :create, params: trip_params.merge(emails_to_invite: ['part1@gmail.com', 'part2@gmail.com'])
+          end
+        end.to change { ActionMailer::Base.deliveries.count }.by(2)
 
-        expect(enqueued_jobs.size).to eq(1)
+        deliveries = ActionMailer::Base.deliveries.last(2)
+        expect(deliveries.map(&:to).flatten).to contain_exactly('part1@gmail.com', 'part2@gmail.com')
       end
     end
   end

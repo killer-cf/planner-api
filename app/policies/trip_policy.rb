@@ -35,10 +35,6 @@ class TripPolicy < ApplicationPolicy
     owner?
   end
 
-  def confirm?
-    true
-  end
-
   private
 
   def owner?

@@ -14,7 +14,7 @@ describe Api::V1::TripsController do
 
         get :participants, params: { id: trip.id }, format: :json
 
-        expect(response).to be_successful
+        expect(response).to have_http_status(:success)
         expect(response.content_type).to eq('application/json; charset=utf-8')
         json_response = response.parsed_body['participants']
         expect(json_response.count).to eq(5)

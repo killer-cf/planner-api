@@ -1,6 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe Trip, type: :model do
+  describe 'associations' do
+    it { is_expected.to have_many(:guests).conditions(is_owner: false).dependent(:destroy).inverse_of(:trip) }
+    it { is_expected.to have_many(:participants).dependent(:destroy) }
+    it { is_expected.to have_many(:activities).dependent(:destroy) }
+    it { is_expected.to have_many(:links).dependent(:destroy) }
+    it { is_expected.to have_many(:users).through(:participants) }
+    it { is_expected.to have_one(:owner_participant).class_name('Participant').dependent(:destroy) }
+    it { is_expected.to have_one(:owner).through(:owner_participant).source(:user) }
+  end
+
   describe '#valid?' do
     it { is_expected.to validate_presence_of(:destination) }
     it { is_expected.to validate_presence_of(:starts_at) }

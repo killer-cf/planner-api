@@ -5,10 +5,11 @@ describe Api::V1::TripsController do
 
   describe 'GET #index' do
     let(:user) { create(:user) }
-    let!(:trips) { create_list(:trip, 5) }
+    let!(:trips) { create_list(:trip, 5) { |trip| create(:participant, user:, trip:) } }
 
     it 'returns a success response' do
       request.headers.merge!(authorization)
+
       get :index, format: :json
 
       expect(response).to be_successful
@@ -30,6 +31,17 @@ describe Api::V1::TripsController do
       expect(meta['prev_page']).to eq(1)
       expect(meta['total_pages']).to eq(3)
       expect(meta['total_count']).to eq(5)
+    end
+
+    it 'dont return other user trips' do
+      other_trip = create(:trip)
+
+      request.headers.merge!(authorization)
+      get :index, format: :json
+
+      json_response = response.parsed_body['trips']
+      expect(json_response.count).to eq(5)
+      expect(json_response.pluck('id')).not_to include(other_trip.id)
     end
   end
 end

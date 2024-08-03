@@ -1,15 +1,14 @@
 class Api::V1::TripsController < ApplicationController
-  before_action :authenticate, except: :confirm
-  before_action :set_trip, only: %i[show update destroy confirm activities links participants invites]
+  before_action :authenticate
+  before_action :set_trip, only: %i[show update destroy activities links participants invites]
 
   def index
     if params[:page].present?
-      @trips = Trip.page(params[:page]).per(params[:per_page] || 20)
-
+      @trips = current_user.trips.order(starts_at: :desc).page(params[:page]).per(params[:per_page] || 20)
       render json: @trips, meta: pagination_dict(@trips)
     else
-      @trips = Trip.all
-      render json: @trips
+      @trips = current_user.trips
+      render json: @trips.order(starts_at: :desc)
     end
   end
 
@@ -22,8 +21,7 @@ class Api::V1::TripsController < ApplicationController
     set_participants_on_trip
 
     if @trip.save
-      TripMailer.with(owner_name: params[:owner_name], owner_email: params[:owner_email],
-                      trip: @trip).create_trip.deliver_later
+      @trip.send_confirmation_emails
       render json: { trip_id: @trip.id }, status: :created
     else
       render json: { errors: @trip.errors.full_messages }, status: :unprocessable_entity
@@ -40,19 +38,6 @@ class Api::V1::TripsController < ApplicationController
 
   def destroy
     @trip.destroy!
-  end
-
-  def confirm
-    redirect_to "http://localhost:3000/trips/#{@trip.id}", allow_other_host: true and return if @trip.is_confirmed
-
-    @trip.update!(is_confirmed: true)
-
-    participants = @trip.participants.where(is_owner: false)
-    participants.each do |p|
-      TripMailer.with(email: p.email, trip: @trip, participant_id: p.id).confirm_trip.deliver_later
-    end
-
-    redirect_to "http://localhost:3000/trips/#{@trip.id}", allow_other_host: true
   end
 
   def activities
@@ -77,7 +62,7 @@ class Api::V1::TripsController < ApplicationController
   end
 
   def participants
-    render json: @trip.participants.where(is_owner: false)
+    render json: @trip.guests
   end
 
   def invites
