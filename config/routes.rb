@@ -19,6 +19,7 @@ Rails.application.routes.draw do
 
       resources :trips do
         member do
+          get :current_participant
           get :participants
           get :activities
           get :links

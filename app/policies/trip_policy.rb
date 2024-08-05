@@ -35,6 +35,10 @@ class TripPolicy < ApplicationPolicy
     owner?
   end
 
+  def current_participant?
+    true
+  end
+
   private
 
   def owner?

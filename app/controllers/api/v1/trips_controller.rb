@@ -1,6 +1,6 @@
 class Api::V1::TripsController < ApplicationController
   before_action :authenticate
-  before_action :set_trip, only: %i[show update destroy activities links participants invites]
+  before_action :set_trip, only: %i[show update destroy activities links participants invites current_participant]
 
   def index
     if params[:page].present?
@@ -75,6 +75,12 @@ class Api::V1::TripsController < ApplicationController
     else
       render json: { errors: @trip.errors.full_messages }, status: :unprocessable_entity
     end
+  end
+
+  def current_participant
+    render json: @trip.participants.find_by!(user: current_user)
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Participant not found' }, status: :not_found
   end
 
   private
