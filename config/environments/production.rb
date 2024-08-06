@@ -2,6 +2,17 @@ require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
+  config.hosts << "planner.kilder-cf.com"
+
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    :user_name => 'api',
+    :password => Rails.application.credentials.dig(:production, :mailtrap_password),
+    :address => 'live.smtp.mailtrap.io',
+    :host => 'live.smtp.mailtrap.io',
+    :port => '587',
+    :authentication => :login
+  }
 
   # Code is not reloaded between requests.
   config.enable_reloading = false
