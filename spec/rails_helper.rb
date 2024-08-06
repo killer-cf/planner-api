@@ -40,10 +40,12 @@ RSpec.configure do |config|
 
   config.before do
     ENV['WEB_URL'] = 'http://test-url.com'
+    ENV['APP_URL'] = 'http://app-test-url.com'
   end
 
   config.after do
     ENV.delete('WEB_URL')
+    ENV.delete('APP_URL')
   end
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures

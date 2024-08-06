@@ -22,3 +22,11 @@ services:
       - POSTGRES_PASSWORD=docker
       - POSTGRES_DB=planner-test
       - PGDATA=/data/postgres
+
+  redis:
+    container_name: planner_redis
+    image: redis
+    ports:
+      - 6380:6379
+    volumes:
+      - ./data/redis:/data
