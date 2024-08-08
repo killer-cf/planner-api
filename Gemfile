@@ -40,6 +40,7 @@ gem 'dotenv-rails'
 gem 'jwt'
 gem 'kaminari'
 gem 'pundit'
+gem 'resend'
 gem 'rswag'
 gem 'sidekiq'
 

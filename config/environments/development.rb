@@ -1,18 +1,12 @@
 require 'active_support/core_ext/integer/time'
 
 Rails.application.configure do
-  config.hosts << "planner.kilder-cf.com"
+  config.hosts << 'apidevplanner.kilder-cf.com'
 
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.default_url_options = { :host => 'localhost:4000', protocol: 'http' }
-  config.action_mailer.smtp_settings = {
-    :user_name => '4ffbe969bb787a',
-    :password => Rails.application.credentials.dig(:development, :mailtrap_password),
-    :address => 'sandbox.smtp.mailtrap.io',
-    :host => 'sandbox.smtp.mailtrap.io',
-    :port => '2525',
-    :authentication => :login
-  }
+  config.action_mailer.delivery_method = :resend
+
+  config.action_mailer.default_options = { from: 'plann.er <delivered@resend.dev>' }
+
   config.action_mailer.show_previews = true
 
   config.enable_reloading = true
