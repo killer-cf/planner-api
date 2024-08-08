@@ -19,7 +19,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: docker
           POSTGRES_DB: planner_test
-        ports: ["5433:5432"]
+        ports: ["5432:5432"]
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout code
@@ -30,6 +30,11 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+      - name: Wait for PostgreSQL to become available
+        run: |
+          wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
+          chmod +x wait-for-it.sh
+          ./wait-for-it.sh localhost:5432 --timeout=60
       - name: Set up database schema
         run: bin/rails db:schema:load RAILS_ENV=test
       - name: Run tests
