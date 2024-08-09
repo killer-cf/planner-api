@@ -12,6 +12,7 @@ jobs:
       PGHOST: localhost
       PGUSER: postgres
       PGPASSWORD: docker
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
     services:
       db:
         image: postgres:16
