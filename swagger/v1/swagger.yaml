@@ -1,0 +1,615 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+paths:
+  "/api/v1/trips":
+    parameters:
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    get:
+      summary: Retrieves all trips
+      tags:
+      - Trips
+      parameters:
+      - name: page
+        in: query
+        description: Page number
+        required: false
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        description: Items per page
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: trips found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  trips:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: uuid
+                          example: 123e4567-e89b-12d3-a456-426614174000
+                        destination:
+                          type: string
+                          example: Paris
+                        starts_at:
+                          type: string
+                          format: date
+                        ends_at:
+                          type: string
+                          format: date
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+    post:
+      summary: Creates a trip
+      tags:
+      - Trips
+      parameters: []
+      responses:
+        '201':
+          description: trip created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  trip_id:
+                    type: uuid
+                    example: 123e4567-e89b-12d3-a456-426614174000
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Owner name can't be blank
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                destination:
+                  type: string
+                  example: Paris
+                starts_at:
+                  type: string
+                  format: date-time
+                ends_at:
+                  type: string
+                  format: date-time
+                owner_name:
+                  type: string
+                  example: John Doe
+                owner_email:
+                  type: string
+                  format: email
+                  example: jonhdoe@gmail.com
+              required:
+              - destination
+              - starts_at
+              - ends_at
+              - owner_name
+              - owner_email
+  "/api/v1/trips/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    get:
+      summary: Retrieves a trip
+      tags:
+      - Trips
+      responses:
+        '200':
+          description: trip found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: uuid
+                    example: 123e4567-e89b-12d3-a456-426614174000
+                  destination:
+                    type: string
+                    example: Paris
+                  starts_at:
+                    type: string
+                    format: date-time
+                    example: '2023-12-01T00:00:00Z'
+                  ends_at:
+                    type: string
+                    format: date-time
+                    example: '2023-12-10T00:00:00Z'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+        '404':
+          description: trip not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Trip with id: invalid not found'
+                required:
+                - error
+    put:
+      summary: Updates a trip
+      tags:
+      - Trips
+      parameters: []
+      responses:
+        '200':
+          description: trip updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: uuid
+                    example: 123e4567-e89b-12d3-a456-426614174000
+                  destination:
+                    type: string
+                    example: Recife, Brazil
+                  starts_at:
+                    type: string
+                    format: date-time
+                    example: '2023-12-01T00:00:00Z'
+                  ends_at:
+                    type: string
+                    format: date-time
+                    example: '2023-12-10T00:00:00Z'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+        '404':
+          description: trip not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Trip with id: invalid not found'
+                required:
+                - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                destination:
+                  type: string
+                  example: Paris
+                starts_at:
+                  type: string
+                  format: date-time
+                ends_at:
+                  type: string
+                  format: date-time
+              required:
+              - destination
+              - starts_at
+              - ends_at
+    delete:
+      summary: Deletes a trip
+      tags:
+      - Trips
+      responses:
+        '204':
+          description: trip deleted
+        '401':
+          description: unauthorized
+        '404':
+          description: trip not found
+  "/api/v1/trips/{id}/activities":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    get:
+      summary: Retrieves activities for a trip
+      tags:
+      - Trips
+      responses:
+        '200':
+          description: activities found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  activities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: uuid
+                          example: 123e4567-e89b-12d3-a456-426614174000
+                        title:
+                          type: string
+                          example: Visit Eiffel Tower
+                        occurs_at:
+                          type: string
+                          format: date-time
+                          example: '2023-12-02T10:00:00Z'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+        '404':
+          description: trip not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Trip with id: invalid not found'
+                required:
+                - error
+  "/api/v1/trips/{id}/links":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    get:
+      summary: Retrieves links for a trip
+      tags:
+      - Trips
+      responses:
+        '200':
+          description: links found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: uuid
+                          example: 123e4567-e89b-12d3-a456-426614174000
+                        url:
+                          type: string
+                          example: https://example.com
+                        title:
+                          type: string
+                          example: Link to itinerary
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+        '404':
+          description: trip not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Trip with id: invalid not found'
+                required:
+                - error
+  "/api/v1/trips/{id}/participants":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    get:
+      summary: Retrieves participants for a trip
+      tags:
+      - Trips
+      responses:
+        '200':
+          description: participants found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  participants:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: uuid
+                          example: 123e4567-e89b-12d3-a456-426614174000
+                        name:
+                          type: string
+                          example: John Doe
+                        email:
+                          type: string
+                          format: email
+                          example: john@example.com
+                        is_owner:
+                          type: boolean
+                          example: true
+                        is_confirmed:
+                          type: boolean
+                          example: true
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+        '404':
+          description: trip not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Trip with id: invalid not found'
+                required:
+                - error
+  "/api/v1/trips/{id}/invites":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    post:
+      summary: Invites a participant to a trip
+      tags:
+      - Trips
+      parameters: []
+      responses:
+        '200':
+          description: participant invited
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  participant_id:
+                    type: uuid
+                    example: 123e4567-e89b-12d3-a456-426614174000
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Email can't be blank
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Forbidden
+                required:
+                - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: invitee@example.com
+                name:
+                  type: string
+                  example: Joao
+              required:
+              - email
+  "/api/v1/trips/{id}/current_participant":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    get:
+      summary: Retrieves the current participant for a trip
+      tags:
+      - Trips
+      responses:
+        '200':
+          description: current participant found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: uuid
+                    example: 123e4567-e89b-12d3-a456-426614174000
+                  name:
+                    type: string
+                    example: John Doe
+                  email:
+                    type: string
+                    format: email
+                    example: john@example.com
+                  is_owner:
+                    type: boolean
+                    example: true
+                  is_confirmed:
+                    type: boolean
+                    example: true
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+        '404':
+          description: participant not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Participant not found
+                required:
+                - error

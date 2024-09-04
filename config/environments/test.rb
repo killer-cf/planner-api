@@ -7,6 +7,7 @@ require 'active_support/core_ext/integer/time'
 
 Rails.application.configure do
   config.hosts << 'planner.kilder-cf.com'
+  config.hosts << "www.example.com"
 
   config.action_mailer.default_options = { from: 'plann.er <delivered@resend.dev>' }
   # Settings specified here will take precedence over those in config/application.rb.
