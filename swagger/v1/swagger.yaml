@@ -268,6 +268,142 @@ paths:
                     example: 'Activity with id: invalid not found'
                 required:
                 - error
+  "/api/v1/trips/{trip_id}/links":
+    parameters:
+    - name: trip_id
+      in: path
+      description: Trip ID
+      required: true
+      schema:
+        type: string
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    post:
+      summary: Creates a link
+      tags:
+      - Links
+      parameters: []
+      responses:
+        '201':
+          description: link created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  link_id:
+                    type: uuid
+                    example: 123e4567-e89b-12d3-a456-426614174000
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Forbidden
+                required:
+                - error
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Url can't be blank
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: My Link
+                url:
+                  type: string
+                  example: http://example.com
+              required:
+              - title
+              - url
+  "/api/v1/links/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Link ID
+      required: true
+      schema:
+        type: string
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    delete:
+      summary: Deletes a link
+      tags:
+      - Links
+      responses:
+        '204':
+          description: link deleted
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Forbidden
+                required:
+                - error
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+        '404':
+          description: link not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'link with id: invalid not found'
+                required:
+                - error
   "/api/v1/trips":
     parameters:
     - name: authorization
