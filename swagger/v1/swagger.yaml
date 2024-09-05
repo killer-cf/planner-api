@@ -4,6 +4,270 @@ info:
   title: API V1
   version: v1
 paths:
+  "/api/v1/trips/{id}/activities":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    post:
+      summary: Creates an activity
+      tags:
+      - Activities
+      parameters:
+      - name: authorization
+        in: header
+        default: Bearer <token>
+        schema:
+          type: string
+      responses:
+        '201':
+          description: activity created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  activity_id:
+                    type: uuid
+                    example: 123e4567-e89b-12d3-a456-426614174000
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Forbidden
+                required:
+                - error
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Occurs at can't be blank
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Visit Eiffel Tower
+                occurs_at:
+                  type: string
+                  format: date-time
+                  example: '2023-12-01T10:00:00Z'
+              required:
+              - title
+              - occurs_at
+              - trip_id
+    get:
+      summary: Retrieves activities for a trip
+      tags:
+      - Trips
+      responses:
+        '200':
+          description: activities found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  activities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: uuid
+                          example: 123e4567-e89b-12d3-a456-426614174000
+                        title:
+                          type: string
+                          example: Visit Eiffel Tower
+                        occurs_at:
+                          type: string
+                          format: date-time
+                          example: '2023-12-02T10:00:00Z'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+        '404':
+          description: trip not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Trip with id: invalid not found'
+                required:
+                - error
+  "/api/v1/activities/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    put:
+      summary: Updates an activity
+      tags:
+      - Activities
+      parameters: []
+      responses:
+        '204':
+          description: activity updated
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Title can't be blank
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Forbidden
+                required:
+                - error
+        '404':
+          description: activity not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Activity with id: invalid not found'
+                required:
+                - error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Visit Louvre Museum
+                occurs_at:
+                  type: string
+                  format: date-time
+                  example: '2023-12-02T10:00:00Z'
+              required:
+              - title
+              - occurs_at
+    delete:
+      summary: Deletes an activity
+      tags:
+      - Activities
+      responses:
+        '204':
+          description: activity deleted
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Forbidden
+                required:
+                - error
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+        '404':
+          description: activity not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Activity with id: invalid not found'
+                required:
+                - error
   "/api/v1/trips":
     parameters:
     - name: authorization
@@ -276,69 +540,6 @@ paths:
           description: unauthorized
         '404':
           description: trip not found
-  "/api/v1/trips/{id}/activities":
-    parameters:
-    - name: id
-      in: path
-      required: true
-      schema:
-        type: string
-    - name: authorization
-      in: header
-      default: Bearer <token>
-      schema:
-        type: string
-    get:
-      summary: Retrieves activities for a trip
-      tags:
-      - Trips
-      responses:
-        '200':
-          description: activities found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  activities:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: uuid
-                          example: 123e4567-e89b-12d3-a456-426614174000
-                        title:
-                          type: string
-                          example: Visit Eiffel Tower
-                        occurs_at:
-                          type: string
-                          format: date-time
-                          example: '2023-12-02T10:00:00Z'
-        '401':
-          description: unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
-                required:
-                - error
-        '404':
-          description: trip not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: 'Trip with id: invalid not found'
-                required:
-                - error
   "/api/v1/trips/{id}/links":
     parameters:
     - name: id
