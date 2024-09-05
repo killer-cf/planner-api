@@ -11,48 +11,59 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def update_webhook
-    name = "#{params[:data][:first_name]} #{params[:data][:last_name]}".strip
-    email = params[:data][:email_addresses]&.first&.dig(:email_address)
+    user_params = extract_user_params(params[:data])
+    @user.add_participants_by_emails([user_params[:participant_email], user_params[:email]].compact)
 
-    @user.add_participants_by_emails([params[:data][:public_metadata][:participant_email]])
-
-    if @user.update(name: name, email: email)
+    if @user.update(user_params.except(:participant_email))
       render status: :no_content
     else
-      render json: { errors: user.errors.full_messages }, status: :unprocessable
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   def create_webhook
-    name = "#{params[:data][:first_name]} #{params[:data][:last_name]}".strip
-    email = params[:data][:email_addresses]&.first&.dig(:email_address)
-    external_id = params[:data][:id]
-
-    @user = User.new(name: name, email: email, external_id: external_id)
-    @user.add_participants_by_emails([params.dig(:data, :public_metadata, :participant_email), @user.email])
+    user_params = extract_user_params(params[:data])
+    @user = User.new(user_params.except(:participant_email))
+    @user.add_participants_by_emails([user_params[:participant_email], user_params[:email]].compact)
 
     if @user.save
       render status: :no_content
     else
-      render json: { errors: @user.errors.full_messages }, status: :unprocessable
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   def destroy_webhook
-    @user.destroy
+    if @user.destroy
+      render status: :no_content
+    else
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private
 
   def set_user
-    @user = User.find_by(external_id: params[:data][:id])
+    @user = User.find_by!(external_id: params[:data][:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "User with id: #{params[:id]} not found" }, status: :not_found
   end
 
   def validate_params
-    return if params[:data].present?
+    required_keys = %i[id]
+    missing_keys = required_keys.select { |key| params[:data][key].blank? }
 
-    render json: { errors: 'Missing data parameter' }, status: :bad_request
+    return unless missing_keys.any?
+
+    render json: { errors: "Missing data parameters: #{missing_keys.join(', ')}" }, status: :bad_request
+  end
+
+  def extract_user_params(data)
+    {
+      name: "#{data[:first_name]} #{data[:last_name]}".strip,
+      email: data[:email_addresses]&.first&.dig(:email_address),
+      external_id: data[:id],
+      participant_email: data.dig(:public_metadata, :participant_email)
+    }
   end
 end

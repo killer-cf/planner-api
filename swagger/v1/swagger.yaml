@@ -950,3 +950,222 @@ paths:
                     example: Participant not found
                 required:
                 - error
+  "/api/v1/users/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    get:
+      summary: Retrieves a user
+      tags:
+      - Users
+      responses:
+        '200':
+          description: user found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: 123e4567-e89b-12d3-a456-426614174000
+                  name:
+                    type: string
+                    example: John Doe
+                  email:
+                    type: string
+                    example: john.doe@example.com
+                  trip_ids:
+                    type: array
+                    items:
+                      type: string
+                      example: 123e4567-e89b-12d3-a456-426614174000
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Unauthorized
+                required:
+                - error
+        '404':
+          description: user not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'User with id: invalid not found'
+                required:
+                - error
+  "/api/v1/users/create_webhook":
+    parameters:
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    - name: data
+      in: body
+      schema:
+        type: object
+        properties:
+          data:
+            type: object
+            properties:
+              first_name:
+                type: string
+                example: John
+              last_name:
+                type: string
+                example: Doe
+              email_addresses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    email_address:
+                      type: string
+                      example: john.doe@example.com
+              id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174000
+              public_metadata:
+                type: object
+                properties:
+                  participant_email:
+                    type: string
+                    example: participant@example.com
+        required:
+        - data
+    post:
+      summary: Creates a user via webhook
+      tags:
+      - Users
+      responses:
+        '204':
+          description: user created
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Email can't be blank
+  "/api/v1/users/update_webhook":
+    parameters:
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    - name: data
+      in: body
+      schema:
+        type: object
+        properties:
+          data:
+            type: object
+            properties:
+              first_name:
+                type: string
+                example: John
+              last_name:
+                type: string
+                example: Doe
+              email_addresses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    email_address:
+                      type: string
+                      example: john.doe@example.com
+              id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174000
+              public_metadata:
+                type: object
+                properties:
+                  participant_email:
+                    type: string
+                    example: participant@example.com
+        required:
+        - data
+    post:
+      summary: Updates a user via webhook
+      tags:
+      - Users
+      responses:
+        '204':
+          description: user updated
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: Email can't be blank
+  "/api/v1/users/destroy_webhook":
+    parameters:
+    - name: authorization
+      in: header
+      default: Bearer <token>
+      schema:
+        type: string
+    - name: data
+      in: body
+      schema:
+        type: object
+        properties:
+          data:
+            type: object
+            properties:
+              id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174000
+        required:
+        - data
+    post:
+      summary: Destroys a user via webhook
+      tags:
+      - Users
+      responses:
+        '204':
+          description: user destroyed
+        '404':
+          description: user not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'User with id: invalid not found'
+                required:
+                - error
